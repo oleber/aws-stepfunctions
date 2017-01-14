@@ -10,4 +10,7 @@ libraryDependencies ++= Seq(
 )
 scalacOptions in Test ++= Seq("-Yrangepos")
 
+scalacOptions += "-feature"
+scalacOptions += "-deprecation"
+
 fork in run := true
