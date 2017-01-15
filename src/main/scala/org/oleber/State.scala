@@ -19,6 +19,8 @@ object State {
     implicit def toOption[T](value: T): Option[T] = Option(value)
   }
 
+  import Implicits._
+
   case class StateException(str: String) extends Exception
 
   object StateType {
@@ -367,6 +369,8 @@ object State {
 
       implicit def apply(value: Double): Numeric = Numeric(Right(value))
 
+      implicit def apply(value: Int): Numeric = Numeric(Left(value.toLong))
+
       implicit val format = new Format[Numeric] {
         override def reads(json: JsValue): JsResult[Numeric] = json
           .validate[Long]
@@ -575,10 +579,70 @@ object State {
   }
 
   object WaitState {
+    def Seconds(
+                 Seconds: Long,
+                 follow: Follow,
+                 InputPath: Option[String] = None,
+                 OutputPath: Option[String] = None,
+                 Comment: Option[String] = None
+               ) = WaitState(
+      Seconds = Seconds,
+      follow = follow,
+      InputPath = InputPath,
+      OutputPath = OutputPath,
+      Comment = Comment
+    )
+
+    def SecondsPath(
+                     SecondsPath: String,
+                     follow: Follow,
+                     InputPath: Option[String] = None,
+                     OutputPath: Option[String] = None,
+                     Comment: Option[String] = None
+                   ) = WaitState(
+      SecondsPath = SecondsPath,
+      follow = follow,
+      InputPath = InputPath,
+      OutputPath = OutputPath,
+      Comment = Comment
+    )
+
+    def Timestamp(
+                   Timestamp: ZonedDateTime,
+                   follow: Follow,
+                   InputPath: Option[String] = None,
+                   OutputPath: Option[String] = None,
+                   Comment: Option[String] = None
+                 ) = WaitState(
+      Timestamp = Timestamp,
+      follow = follow,
+      InputPath = InputPath,
+      OutputPath = OutputPath,
+      Comment = Comment
+    )
+
+    def TimestampPath(
+                       TimestampPath: String,
+                       follow: Follow,
+                       InputPath: Option[String] = None,
+                       OutputPath: Option[String] = None,
+                       Comment: Option[String] = None
+                     ) = WaitState(
+      TimestampPath = TimestampPath,
+      follow = follow,
+      InputPath = InputPath,
+      OutputPath = OutputPath,
+      Comment = Comment
+    )
+
     val format: Format[WaitState] = Json.format[WaitState]
   }
 
   case class WaitState(
+                        Seconds: Option[Long] = None,
+                        SecondsPath: Option[String] = None,
+                        Timestamp: Option[ZonedDateTime] = None,
+                        TimestampPath: Option[String] = None,
                         follow: Follow,
                         InputPath: Option[String] = None,
                         OutputPath: Option[String] = None,

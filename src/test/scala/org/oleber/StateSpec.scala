@@ -1,5 +1,7 @@
 package org.oleber
 
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+
 import org.oleber.State.ChoiceState.{NumericGreaterThanEquals, _}
 import org.oleber.State._
 import org.oleber.State.Implicits._
@@ -98,13 +100,50 @@ class StateSpec extends Specification {
           ),
           TopChoice(
             choice = And(List(
-              NumericGreaterThanEquals("$.value", 20),
-              NumericLessThan("$.value", 30)
+              NumericGreaterThanEquals("$.value", 20l),
+              NumericLessThan("$.value", 30l)
             )),
             Next = "ValueInTwenties"
           )
         ),
         Default = Some("DefaultState")
+      )
+
+      Json.parse(jsonString) must_== Json.toJson(state)
+    }
+
+    "Wait State" in {
+      val jsonString =
+        """
+          |{
+          |    "wait_ten_seconds" : {
+          |        "Type" : "Wait",
+          |        "Seconds" : 10,
+          |        "Next": "NextState"
+          |    },
+          |    "wait_ten_seconds_path" : {
+          |        "Type" : "Wait",
+          |        "SecondsPath" : "$.expirydate",
+          |        "Next": "NextState"
+          |    },
+          |    "wait_until" : {
+          |        "Type": "Wait",
+          |        "Timestamp": "2016-03-14T01:59:00Z[GMT]",
+          |        "Next": "NextState"
+          |    },
+          |    "wait_until_path" : {
+          |        "Type": "Wait",
+          |        "TimestampPath": "$.expirydate",
+          |        "Next": "NextState"
+          |    }
+          |}
+        """.stripMargin
+
+      val state = Map(
+        "wait_ten_seconds" -> WaitState.Seconds(10, Follow.Next("NextState")),
+        "wait_ten_seconds_path" -> WaitState.SecondsPath("$.expirydate", Follow.Next("NextState")),
+        "wait_until" -> WaitState.Timestamp(ZonedDateTime.of(2016, 3, 14, 1, 59, 0, 0, ZoneId.of("GMT")), Follow.Next("NextState")),
+        "wait_until_path" -> WaitState.TimestampPath("$.expirydate", Follow.Next("NextState"))
       )
 
       Json.parse(jsonString) must_== Json.toJson(state)
