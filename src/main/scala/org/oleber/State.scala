@@ -1,6 +1,5 @@
 package org.oleber
 
-import org.oleber.NamedState.StateName
 import org.oleber.state._
 import play.api.libs.json._
 
@@ -43,21 +42,17 @@ object State {
 
   object Follow {
 
-    object EndFollow extends Follow
+    object End extends Follow
 
-    case class NextFollow(Next: StateName) extends Follow
+    case class Next(Next: String) extends Follow
 
-    object NextFollow {
-      val format = Json.format[NextFollow]
+    object Next {
+      val format = Json.format[Next]
     }
-
-    def End: Follow = EndFollow
-
-    def Next(namedState: StateName): Follow = NextFollow(namedState)
 
     implicit val format = new Format[Follow] {
       override def reads(json: JsValue): JsResult[Follow] = {
-        json.validate(NextFollow.format) orElse {
+        json.validate(Next.format) orElse {
           json.validate[String].map({
             case "End" => End
           })
@@ -66,11 +61,11 @@ object State {
 
       override def writes(follow: Follow): JsValue = {
         follow match {
-          case EndFollow =>
+          case End =>
             import play.api.libs.json.Json._
             obj("End" -> true)
-          case nextFollow: NextFollow =>
-            Json.toJson(nextFollow)(NextFollow.format)
+          case nextFollow: Next =>
+            Json.toJson(nextFollow)(Next.format)
         }
       }
     }
@@ -138,7 +133,7 @@ object State {
     override def reads(json: JsValue): JsResult[State] = {
       def jsResultFollow: JsResult[Follow] = (json \ "Next")
         .validate[String]
-        .map(name => Follow.Next(StateName(name)))
+        .map(name => Follow.Next(name))
         .orElse(
           (json \ "End")
             .validate[Boolean]
@@ -193,7 +188,7 @@ object State {
 
   case class Catcher(
                       ErrorEquals: List[String],
-                      Next: StateName,
+                      Next: String,
                       ResultPath: Option[String] = None
                     )
 

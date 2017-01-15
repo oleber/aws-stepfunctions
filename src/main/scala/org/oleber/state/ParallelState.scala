@@ -1,6 +1,5 @@
 package org.oleber.state
 
-import org.oleber.NamedState.StateName
 import org.oleber.State.{Catcher, Follow, Retrier, State, StateVisitor}
 import org.oleber.state.ParallelState.Branche
 import play.api.libs.json._
@@ -10,7 +9,7 @@ import scala.collection.Map
 object ParallelState {
 
   case class Branche(
-                      StartAt: StateName,
+                      StartAt: String,
                       States: Map[String, State]
                     )
 
@@ -30,7 +29,7 @@ object ParallelState {
       }
     }
 
-    implicit val format: Format[Branche] = Json.format[Branche]
+    implicit val format = Json.format[Branche]
   }
 
   val format: Format[ParallelState] = Json.format[ParallelState]

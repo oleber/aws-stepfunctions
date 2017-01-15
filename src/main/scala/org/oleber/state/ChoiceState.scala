@@ -2,10 +2,11 @@ package org.oleber.state
 
 import java.time.ZonedDateTime
 
-import org.oleber.NamedState.StateName
 import org.oleber.State.{State, StateException, StateVisitor}
 import org.oleber.state.ChoiceState.TopChoice
 import play.api.libs.json.{JsObject, _}
+
+import scala.language.implicitConversions
 
 object ChoiceState {
 
@@ -312,7 +313,7 @@ object ChoiceState {
   }
 
 
-  case class TopChoice(choice: Choice, Next: StateName)
+  case class TopChoice(choice: Choice, Next: String)
 
   object TopChoice {
     implicit val format = new Format[TopChoice] {
@@ -340,7 +341,7 @@ object ChoiceState {
 
 case class ChoiceState(
                         Choices: List[TopChoice],
-                        Default: Option[StateName],
+                        Default: Option[String] = None,
                         InputPath: Option[String] = None,
                         OutputPath: Option[String] = None,
                         Comment: Option[String] = None
