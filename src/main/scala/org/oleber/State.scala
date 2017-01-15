@@ -670,6 +670,8 @@ object State {
   }
 
   case class FailState(
+                        Error: String,
+                        Cause: String,
                         Comment: Option[String] = None
                       ) extends State {
     override def accept[T](visitor: StateVisitor[T]): T =
