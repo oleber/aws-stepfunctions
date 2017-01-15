@@ -1,11 +1,12 @@
 package org.oleber
 
-import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.{ZoneId, ZonedDateTime}
 
-import org.oleber.State.ChoiceState.{NumericGreaterThanEquals, _}
 import org.oleber.State._
 import org.oleber.State.Implicits._
-import org.oleber.State.ParallelState.Branche
+import org.oleber.state.ChoiceState._
+import org.oleber.state.ParallelState.Branche
+import org.oleber.state._
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 import play.api.libs.json.Json._
