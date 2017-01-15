@@ -148,5 +148,18 @@ class StateSpec extends Specification {
 
       Json.parse(jsonString) must_== Json.toJson(state)
     }
+
+    "Succeed State" in {
+      val jsonString =
+        """
+          |{
+          |  "Type": "Succeed"
+          |}
+        """.stripMargin
+
+      val state = SucceedState()
+
+      Json.parse(jsonString) must_== Json.toJson(state)
+    }
   }
 }
