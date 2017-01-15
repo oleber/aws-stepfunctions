@@ -4,6 +4,8 @@ import org.oleber.NamedState.StateName
 import org.oleber.State.State
 import play.api.libs.json.{Format, JsResult, JsValue, Json}
 
+import scala.language.implicitConversions
+
 object StateMachine {
   implicit val format = new Format[StateMachine] {
     override def writes(stateMachine: StateMachine): JsValue =

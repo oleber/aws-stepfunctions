@@ -5,6 +5,7 @@ import org.oleber.State.State
 import play.api.libs.json.Json
 
 import scala.concurrent.Promise
+import scala.language.implicitConversions
 import scala.util.{Failure, Success}
 
 object RawStateMachine {
@@ -17,7 +18,6 @@ object RawStateMachine {
   }
 
   implicit def fromStateMachine(stateMachine: StateMachine): RawStateMachine = {
-
     RawStateMachine(
       StartAt = stateMachine.StartAt.name,
       States = stateMachine.States.map(namedState => namedState.name.name -> stateFor(namedState)).toMap,

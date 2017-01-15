@@ -3,12 +3,13 @@ package org.oleber
 import java.time.ZonedDateTime
 
 import org.oleber.NamedState.StateName
-import org.oleber.State.ChoiceState.{Choice, TopChoice}
+import org.oleber.State.ChoiceState.TopChoice
+import org.oleber.State.ParallelState.Branche
 import play.api.libs.json._
 
 import scala.collection.Map
 import scala.language.implicitConversions
-import scala.util.{Failure, Try}
+
 
 object State {
 
@@ -70,7 +71,8 @@ object State {
       override def writes(follow: Follow): JsValue = {
         follow match {
           case EndFollow =>
-            JsString("End")
+            import play.api.libs.json.Json._
+            obj("End" -> true)
           case nextFollow: NextFollow =>
             Json.toJson(nextFollow)(NextFollow.format)
         }
@@ -679,16 +681,42 @@ object State {
   }
 
   object ParallelState {
+
+    case class Branche(
+                        StartAt: StateName,
+                        States: Map[String, State]
+                      )
+
+    object Branche {
+      implicit val formatMap = new Format[Map[String, State]] {
+        override def writes(value: Map[String, State]): JsValue = {
+          val pairs = value map { case (key, state) =>
+            key -> Json.toJson(state)
+          }
+          new JsObject(pairs)
+        }
+
+        override def reads(json: JsValue): JsResult[Map[String, State]] = {
+          json.validate[JsObject] map { case JsObject(pairs) =>
+            pairs map { case (k, v) => k -> v.as[State] }
+          }
+        }
+      }
+
+      implicit val format: Format[Branche] = Json.format[Branche]
+    }
+
     val format: Format[ParallelState] = Json.format[ParallelState]
   }
 
   case class ParallelState(
+                            Branches: List[Branche],
                             follow: Follow,
                             InputPath: Option[String] = None,
                             OutputPath: Option[String] = None,
                             ResultPath: Option[String] = None,
-                            Retry: Option[List[Retrier]],
-                            Catch: Option[List[Catcher]],
+                            Retry: Option[List[Retrier]] = None,
+                            Catch: Option[List[Catcher]] = None,
                             Comment: Option[String] = None
                           ) extends State {
     override def accept[T](visitor: StateVisitor[T]): T =

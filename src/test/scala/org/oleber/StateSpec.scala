@@ -5,6 +5,7 @@ import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 import org.oleber.State.ChoiceState.{NumericGreaterThanEquals, _}
 import org.oleber.State._
 import org.oleber.State.Implicits._
+import org.oleber.State.ParallelState.Branche
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 import play.api.libs.json.Json._
@@ -180,5 +181,64 @@ class StateSpec extends Specification {
       Json.parse(jsonString) must_== Json.toJson(state)
     }
 
+    "Parallel State" in {
+      val jsonString =
+        """
+          |{
+          |  "Type": "Parallel",
+          |  "Branches": [
+          |    {
+          |      "StartAt": "LookupAddress",
+          |      "States": {
+          |        "LookupAddress": {
+          |          "Type": "Task",
+          |          "Resource":
+          |            "arn:aws:lambda:us-east-1:123456789012:function:AddressFinder",
+          |          "End": true
+          |        }
+          |      }
+          |    },
+          |    {
+          |      "StartAt": "LookupPhone",
+          |      "States": {
+          |        "LookupPhone": {
+          |          "Type": "Task",
+          |          "Resource":
+          |            "arn:aws:lambda:us-east-1:123456789012:function:PhoneFinder",
+          |          "End": true
+          |        }
+          |      }
+          |    }
+          |  ],
+          |  "Next": "NextState"
+          |}
+        """.stripMargin
+
+      val state = ParallelState(
+        Branches = List(
+          Branche(
+            StartAt = "LookupAddress",
+            States = Map(
+              "LookupAddress" -> TaskState(
+                Resource = "arn:aws:lambda:us-east-1:123456789012:function:AddressFinder",
+                follow = Follow.End
+              )
+            )
+          ),
+          Branche(
+            StartAt = "LookupPhone",
+            States = Map(
+              "LookupPhone" -> TaskState(
+                Resource = "arn:aws:lambda:us-east-1:123456789012:function:PhoneFinder",
+                follow = Follow.End
+              )
+            )
+          )
+        ),
+        follow = Follow.Next("NextState")
+      )
+
+      Json.parse(jsonString) must_== Json.toJson(state)
+    }
   }
 }
