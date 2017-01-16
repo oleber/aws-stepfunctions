@@ -2,6 +2,7 @@ package org.oleber.state
 
 import java.time.ZonedDateTime
 
+import org.oleber.State.Follow.Next
 import org.oleber.State.{State, StateException, StateVisitor}
 import org.oleber.state.ChoiceState.TopChoice
 import play.api.libs.json.{JsObject, _}
@@ -313,20 +314,20 @@ object ChoiceState {
   }
 
 
-  case class TopChoice(choice: Choice, Next: String)
+  case class TopChoice(choice: Choice, Next: Next)
 
   object TopChoice {
     implicit val format = new Format[TopChoice] {
       override def reads(json: JsValue): JsResult[TopChoice] = for {
         next <- (json \ "Next").validate[String]
         choice <- json.validate[Choice]
-      } yield TopChoice(choice, next)
+      } yield TopChoice(choice, Next(next))
 
 
       override def writes(o: TopChoice): JsValue = {
         Json.toJson(o.choice) match {
           case JsObject(pairs) =>
-            val nextJson = "Next" -> Json.toJson(o.Next)
+            val nextJson = "Next" -> Json.toJson(o.Next.Next)
             val newPairs = pairs + nextJson
             JsObject(newPairs)
           case other =>

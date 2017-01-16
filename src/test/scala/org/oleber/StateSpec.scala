@@ -2,6 +2,7 @@ package org.oleber
 
 import java.time.{ZoneId, ZonedDateTime}
 
+import org.oleber.State.Follow.Next
 import org.oleber.State._
 import org.oleber.State.Implicits._
 import org.oleber.state.ChoiceState._
@@ -98,14 +99,14 @@ class StateSpec extends Specification {
         Choices = List(
           TopChoice(
             choice = Not(StringEquals("$.type", "Private")),
-            Next = "Public"
+            Next = Next("Public")
           ),
           TopChoice(
             choice = And(List(
               NumericGreaterThanEquals("$.value", 20l),
               NumericLessThan("$.value", 30l)
             )),
-            Next = "ValueInTwenties"
+            Next = Next("ValueInTwenties")
           )
         ),
         Default = Some("DefaultState")
