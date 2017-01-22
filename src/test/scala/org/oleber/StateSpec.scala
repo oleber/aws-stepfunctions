@@ -11,6 +11,7 @@ import org.oleber.state._
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 import play.api.libs.json.Json._
+import scala.concurrent.duration._
 
 class StateSpec extends Specification {
   "State" should {
@@ -57,8 +58,8 @@ class StateSpec extends Specification {
         Comment = "Task State example",
         Resource = "arn:aws:swf:us-east-1:123456789012:task:HelloWorld",
         follow = Follow.Next("NextState"),
-        TimeoutSeconds = 300,
-        HeartbeatSeconds = 60
+        TimeoutSeconds = 5.minutes,
+        HeartbeatSeconds = 1.minute
       )
 
       Json.parse(jsonString) must_== Json.toJson(state)
@@ -143,7 +144,7 @@ class StateSpec extends Specification {
         """.stripMargin
 
       val state = Map(
-        "wait_ten_seconds" -> WaitState.Seconds(10, Follow.Next("NextState")),
+        "wait_ten_seconds" -> WaitState.Seconds(10.seconds, Follow.Next("NextState")),
         "wait_ten_seconds_path" -> WaitState.SecondsPath("$.expirydate", Follow.Next("NextState")),
         "wait_until" -> WaitState.Timestamp(ZonedDateTime.of(2016, 3, 14, 1, 59, 0, 0, ZoneId.of("GMT")), Follow.Next("NextState")),
         "wait_until_path" -> WaitState.TimestampPath("$.expirydate", Follow.Next("NextState"))

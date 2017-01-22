@@ -4,6 +4,8 @@ import org.oleber.state._
 import play.api.libs.json._
 
 import scala.collection.Map
+import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.language.implicitConversions
 
 object State {
@@ -13,6 +15,14 @@ object State {
     import scala.language.implicitConversions
 
     implicit def toOption[T](value: T): Option[T] = Option(value)
+
+    implicit val formatFiniteDuration = new Format[FiniteDuration] {
+      override def writes(o: FiniteDuration): JsValue = JsNumber(o.toSeconds)
+
+      override def reads(json: JsValue): JsResult[FiniteDuration] = json.validate[Long] map { seconds =>
+        seconds.seconds
+      }
+    }
   }
 
   import Implicits._
@@ -177,7 +187,7 @@ object State {
 
   case class Retrier(
                       ErrorEquals: List[String],
-                      IntervalSeconds: Option[Long] = None,
+                      IntervalSeconds: Option[FiniteDuration] = None,
                       MaxAttempts: Option[Long] = None,
                       BackoffRate: Option[Float] = None
                     )

@@ -5,11 +5,13 @@ import java.time.ZonedDateTime
 import org.oleber.State.{Follow, State, StateVisitor}
 import play.api.libs.json.{Format, Json}
 
+import scala.concurrent.duration.FiniteDuration
+
 object WaitState {
   import org.oleber.State.Implicits._
 
   def Seconds(
-               Seconds: Long,
+               Seconds: FiniteDuration,
                follow: Follow,
                InputPath: Option[String] = None,
                OutputPath: Option[String] = None,
@@ -68,7 +70,7 @@ object WaitState {
 }
 
 case class WaitState(
-                      Seconds: Option[Long] = None,
+                      Seconds: Option[FiniteDuration] = None,
                       SecondsPath: Option[String] = None,
                       Timestamp: Option[ZonedDateTime] = None,
                       TimestampPath: Option[String] = None,
