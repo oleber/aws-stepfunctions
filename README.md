@@ -31,3 +31,7 @@ StateMachine(
   )
 )
 ```
+
+## Do you want to use it?
+
+Just copy the code. I did it ;)
